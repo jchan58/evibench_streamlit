@@ -1,3 +1,5 @@
 streamlit
 pymongo
+streamlit-extras
+openai
 pandas
