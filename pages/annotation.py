@@ -451,29 +451,35 @@ else:
             with st.expander(f"Answer {i}"):
                 st.write(row[f"Answer{i}"])
         st.markdown("---")
+        saved_best = st.session_state.current_responses.get("best_answers", [])
         best_answers_selected = st.multiselect(
             "Which answers were the best? (Select all that applies)",
             ["Answer 1", "Answer 2", "Answer 3", "Answer 4"],
+            default=saved_best,
             key=f"best_answers_{row['QID']}"
         )
 
-        if st.button("Submit"):
-            if not best_answers_selected:
-                st.error("Please select at least one answer before submitting.")
-            else:
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+        with cols[0]:
+            if st.button("Back", key=f"final_back_{row['QID']}"):
                 st.session_state.current_responses["best_answers"] = best_answers_selected
-
-                # Save final record
-                responses_collection.insert_one({
-                    "email": user_email, 
-                    "qid": int(row["QID"]),
-                    "responses": st.session_state.current_responses, 
-                    "timestamp": datetime.datetime.utcnow()
-                })
-
-                # Reset
-                st.session_state.answer_idx = 0
-                st.session_state.current_responses = {}
-                st.success("Response submitted!")
-                st.switch_page("pages/annotation.py")
+                st.session_state.answer_idx = 4
+                st.rerun()
+        
+        with cols[7]:
+            if st.button("Submit"):
+                if not best_answers_selected:
+                    st.error("Please select at least one answer before submitting.")
+                else:
+                    st.session_state.current_responses["best_answers"] = best_answers_selected
+                    responses_collection.insert_one({
+                        "email": user_email, 
+                        "qid": int(row["QID"]),
+                        "responses": st.session_state.current_responses, 
+                        "timestamp": datetime.datetime.utcnow()
+                    })
+                    st.session_state.answer_idx = 0
+                    st.session_state.current_responses = {}
+                    st.success("Response submitted!")
+                    st.switch_page("pages/annotation.py")
 
