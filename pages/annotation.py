@@ -128,8 +128,9 @@ else:
         )
         
         # clear the accuracy comment when change
-        if accuracy != accuracy_default:
-            accuracy_explain_default = ""
+        explain_key = f"accuracy_explain_{row['QID']}_{idx+1}"
+        if accuracy != accuracy_default and explain_key in st.session_state:
+            st.session_state[explain_key] = ""
 
         # require explanation for moderate or low answers
         if accuracy == "Moderate":
