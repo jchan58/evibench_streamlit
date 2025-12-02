@@ -257,30 +257,109 @@ else:
 
     # Show reference page as last page
     if idx == 4:
-        st.markdown('Select your preferred reference list')
-        st.markdown("### 📚 References")
+        st.markdown("### 📚 Reference Evaluation")
+        st.markdown("Please rate the quality of each reference and then select your preferred one.")
+
+        reference_ratings = {}
+
         for i in range(1, 5):
-            with st.expander(f"📚 Reference {i}"):
+            st.markdown(f"#### Reference {i}")
+            with st.expander(f"📚 Reference {i} Content"):
                 st.code(row[f"Reference{i}"], language="text")
 
+            rating_key = f"ref_rating_{row['QID']}_{i}"
+            comment_key = f"ref_comment_{row['QID']}_{i}"
+
+            rating = st.radio(
+                f"How was Reference {i}?",
+                ["Good", "Average", "Bad"],
+                index=None,
+                key=rating_key
+            )
+
+            # Require comment if Average or Bad
+            if rating in ["Average", "Bad"]:
+                comment = st.text_area(
+                    f"Please explain why Reference {i} was {rating.lower()}:",
+                    key=comment_key,
+                    height=80
+                )
+            else:
+                comment = None
+
+            reference_ratings[f"Reference{i}"] = {
+                "rating": rating,
+                "comment": comment
+            }
+
+            st.markdown("---")
+
+        # Preferred reference
         preferred = st.radio(
             "Which reference do you prefer overall?",
             ["Reference 1", "Reference 2", "Reference 3", "Reference 4"],
             index=None,
             key=f"preferred_{row['QID']}"
         )
-        if st.button("Submit"):
+
+        # Next button
+        if st.button("Next"):
+            valid = True
+            errors = []
+
+            # Validate all reference ratings
+            for i in range(1, 5):
+                r = reference_ratings[f"Reference{i}"]["rating"]
+                c = reference_ratings[f"Reference{i}"]["comment"]
+
+                if r is None:
+                    valid = False
+                    errors.append(f"Please rate Reference {i}.")
+                if r in ["Average", "Bad"] and (not c or not c.strip()):
+                    valid = False
+                    errors.append(f"Please provide a comment for Reference {i}.")
+
             if preferred is None:
-                st.error("Please select your preferred reference before submitting.")
+                valid = False
+                errors.append("Please select your preferred reference.")
+
+            if not valid:
+                for msg in errors:
+                    st.error(msg)
             else:
+                # Save to session state
+                st.session_state.current_responses["reference_ratings"] = reference_ratings
+                st.session_state.current_responses["preferred_reference"] = preferred
+
+                st.session_state.answer_idx = 5
+                st.rerun()
+
+    if idx == 5:
+        st.markdown("### Select the Best Answers")
+        st.markdown("You have reviewed all answers. Please select which answers you felt were the best.")
+        best_answers_selected = st.multiselect(
+            "Which answers were the best? (Select all that applies)",
+            ["Answer 1", "Answer 2", "Answer 3", "Answer 4"],
+            key=f"best_answers_{row['QID']}"
+        )
+
+        if st.button("Submit"):
+            if not best_answers_selected:
+                st.error("Please select at least one answer before submitting.")
+            else:
+                st.session_state.current_responses["best_answers"] = best_answers_selected
+
+                # Save final record
                 responses_collection.insert_one({
                     "email": user_email, 
                     "qid": int(row["QID"]),
                     "responses": st.session_state.current_responses, 
-                    "preferred_reference": preferred,
                     "timestamp": datetime.datetime.utcnow()
                 })
+
+                # Reset
                 st.session_state.answer_idx = 0
                 st.session_state.current_responses = {}
                 st.success("Response submitted!")
                 st.switch_page("pages/annotation.py")
+
