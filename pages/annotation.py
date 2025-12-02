@@ -85,12 +85,7 @@ else:
 
     idx = st.session_state.answer_idx
 
-    # create the back button
-    if idx > 0:
-        if st.button("⬅️ Back"):
-            st.session_state.answer_idx = max(0, idx - 1)
-            st.rerun()
-
+    # Only show answers when idx is greater than 4
     if idx < 4:
         ans_col = f"Answer{idx+1}"
         ref_col = f"Reference{idx+1}"
