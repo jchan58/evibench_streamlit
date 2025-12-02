@@ -85,7 +85,12 @@ else:
 
     idx = st.session_state.answer_idx
 
-    # Only show answers when idx is greater than 4
+    # create the back button
+    if idx > 0:
+        if st.button("⬅️ Back"):
+            st.session_state.answer_idx = max(0, idx - 1)
+            st.rerun()
+
     if idx < 4:
         ans_col = f"Answer{idx+1}"
         ref_col = f"Reference{idx+1}"
@@ -294,7 +299,6 @@ else:
 
             st.markdown("---")
 
-        # Preferred reference
         preferred = st.radio(
             "Which reference do you prefer overall?",
             ["Reference 1", "Reference 2", "Reference 3", "Reference 4"],
@@ -302,7 +306,6 @@ else:
             key=f"preferred_{row['QID']}"
         )
 
-        # Next button
         if st.button("Next"):
             valid = True
             errors = []
