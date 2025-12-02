@@ -542,4 +542,5 @@ else:
                     st.session_state.answer_idx = 0
                     st.session_state.current_responses = {}
                     go_to_next_uncompleted()
+                    st.rerun()
 
