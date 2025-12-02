@@ -126,8 +126,12 @@ else:
                 if accuracy_default else None),
             key=f"accuracy_{row['QID']}_{idx+1}"
         )
+        
+        # clear the accuracy comment when change
+        if accuracy != accuracy_default:
+            accuracy_explain_default = ""
 
-        # Require explanation for Moderate or Low Answers
+        # require explanation for moderate or low answers
         if accuracy == "Moderate":
             accuracy_explain = st.text_area(
                 "Please explain why the accuracy was moderate:",
@@ -170,7 +174,7 @@ else:
         if analysis_cat != analysis_cat_default:
             analysis_detail_default = []
             analysis_other_default = ""
-            
+
         if analysis_cat == 'Good': 
             analysis_detail = st.multiselect(
                 "Why was it good? (select all that apply)",
