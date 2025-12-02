@@ -5,6 +5,15 @@ from pymongo import MongoClient
 from streamlit_extras.switch_page_button import switch_page
 import time
 
+# remove the pages sidebar
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] { 
+    display: none !important; 
+}
+</style>
+""", unsafe_allow_html=True)
+
 MAX_ANSWER = 5
 
 # Cache evibench + db
