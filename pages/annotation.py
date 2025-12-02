@@ -459,14 +459,14 @@ else:
             key=f"best_answers_{row['QID']}"
         )
 
-        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back", key=f"final_back_{row['QID']}"):
                 st.session_state.current_responses["best_answers"] = best_answers_selected
                 st.session_state.answer_idx = 4
                 st.rerun()
         
-        with cols[7]:
+        with cols[6]:
             if st.button("Submit"):
                 if not best_answers_selected:
                     st.error("Please select at least one answer before submitting.")
