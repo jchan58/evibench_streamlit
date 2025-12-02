@@ -241,7 +241,7 @@ else:
             height=80
         )
 
-        cols = st.columns([1, 1, 1, 1, 1, 1])
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1])
 
         with cols[0]:
             if st.button("Back") and idx > 0:
@@ -260,6 +260,9 @@ else:
             pass
 
         with cols[5]:
+            pass
+
+        with cols[6]:
             if st.button("Next"): 
                 valid = True
                 error_msgs = []
