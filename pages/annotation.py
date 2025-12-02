@@ -312,13 +312,16 @@ else:
         st.progress(progress_fraction)
         st.caption(f"Answer {idx+1} of 4")
 
-    # Show reference page as last page
+    # show reference page as last page
     if idx == 4:
         st.markdown("### 📚 Reference Evaluation")
         st.markdown("Please rate the quality of each reference and then select your preferred one.")
 
-        reference_ratings = {}
+        # get saved responses
+        saved_refs = st.session_state.current_responses.get("reference_ratings", {})
+        saved_pref = st.session_state.current_responses.get("preferred_reference")
 
+        reference_ratings = {}
         for i in range(1, 5):
             st.markdown(f"#### Reference {i}")
             with st.expander(f"📚 Reference {i} Content"):
@@ -326,18 +329,19 @@ else:
 
             rating_key = f"ref_rating_{row['QID']}_{i}"
             comment_key = f"ref_comment_{row['QID']}_{i}"
-
             rating = st.radio(
                 f"How was Reference {i}?",
                 ["Good", "Average", "Bad"],
-                index=None,
+                index=(["Good", "Average", "Bad"].index(saved_refs.get(f"Reference{i}", {}).get("rating"))
+                    if f"Reference{i}" in saved_refs else None),
                 key=rating_key
             )
 
             # Require comment if Average or Bad
             if rating in ["Average", "Bad"]:
                 comment = st.text_area(
-                    f"Please explain why Reference {i} was {rating.lower()}:",
+                    f"Please explain why Reference {i} was {rating.lower()}",
+                    value=saved_refs.get(f"Reference{i}", {}).get("comment", ""),
                     key=comment_key,
                     height=80
                 )
@@ -354,10 +358,10 @@ else:
         preferred = st.radio(
             "Which reference do you prefer overall?",
             ["Reference 1", "Reference 2", "Reference 3", "Reference 4"],
-            index=None,
+            index=(["Reference 1", "Reference 2", "Reference 3", "Reference 4"].index(saved_pref)
+                if saved_pref else None),
             key=f"preferred_{row['QID']}"
         )
-
         cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back"):
