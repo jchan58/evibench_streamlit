@@ -335,6 +335,10 @@ else:
     if idx == 5:
         st.markdown("### Select the Best Answers")
         st.markdown("You have reviewed all answers. Please select which answers you felt were the best.")
+        for i in range(1, 5):
+            with st.expander(f"Answer {i}"):
+                st.write(row[f"Answer{i}"])
+        st.markdown("---")
         best_answers_selected = st.multiselect(
             "Which answers were the best? (Select all that applies)",
             ["Answer 1", "Answer 2", "Answer 3", "Answer 4"],
