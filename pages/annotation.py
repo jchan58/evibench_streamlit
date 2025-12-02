@@ -318,9 +318,14 @@ else:
         st.markdown("Please rate the quality of each reference and then select your preferred one.")
 
         # get saved responses
-        saved_refs = st.session_state.current_responses.get("reference_ratings", {})
-        saved_pref = st.session_state.current_responses.get("preferred_reference")
-
+        new_refs = {}
+        for i in range(1, 5):
+            new_refs[f"Reference{i}"] = {
+                "rating": st.session_state[f"ref_rating_{row['QID']}_{i}"],
+                "comment": st.session_state.get(f"ref_comment_{row['QID']}_{i}", "")
+            }
+        st.session_state.current_responses["reference_ratings"] = new_refs
+        st.session_state.current_responses["preferred_reference"] = st.session_state[f"preferred_{row['QID']}"]
         reference_ratings = {}
         for i in range(1, 5):
             st.markdown(f"#### Reference {i}")
@@ -365,8 +370,17 @@ else:
         cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back"):
-                st.session_state.current_responses["reference_ratings"] = reference_ratings
-                st.session_state.current_responses["preferred_reference"] = preferred
+                new_refs = {}
+                for i in range(1, 5):
+                    new_refs[f"Reference{i}"] = {
+                        "rating": st.session_state[f"ref_rating_{row['QID']}_{i}"],
+                        "comment": st.session_state.get(f"ref_comment_{row['QID']}_{i}", "")
+                    }
+
+                st.session_state.current_responses["reference_ratings"] = new_refs
+                st.session_state.current_responses["preferred_reference"] = st.session_state.get(
+                    f"preferred_{row['QID']}"
+                )
                 st.session_state.answer_idx = 3
                 st.rerun()
 
