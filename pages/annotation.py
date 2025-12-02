@@ -350,7 +350,17 @@ else:
                 key=rating_key,
             )
 
-            # Require comment if Average or Bad
+            # clear comment if user changes choice
+            prev_rating_key = f"prev_rating_{row['QID']}_{i}"
+            if prev_rating_key not in st.session_state:
+                st.session_state[prev_rating_key] = saved_rating
+
+            if rating != st.session_state[prev_rating_key]:
+                if comment_key in st.session_state:
+                    st.session_state[comment_key] = ""
+
+            st.session_state[prev_rating_key] = rating
+            # require comment if not good
             if rating in ["Average", "Bad"]:
                 comment = st.text_area(
                     f"Please explain why Reference {i} was {rating.lower()}",
