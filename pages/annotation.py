@@ -51,6 +51,20 @@ completed_qids_ptr = responses_collection.find(
 completed_qids = {doc["qid"] for doc in completed_qids_ptr}
 uncompleted_qids = user_df[~user_df['QID'].isin(completed_qids)]
 
+def go_to_next_uncompleted():
+    completed_qids_ptr = responses_collection.find(
+        {"email": user_email}, {"qid": 1, "_id": 0}
+    )
+    completed = {doc["qid"] for doc in completed_qids_ptr}
+    remaining = user_df[~user_df["QID"].isin(completed)]
+    if not remaining.empty:
+        next_qid = remaining.iloc[0]["QID"]
+        st.session_state.current_qid = next_qid
+        st.session_state.answer_idx = 0
+        st.session_state.current_responses = {}
+    else:
+        st.session_state.current_qid = None
+
 def load_saved_response(qid):
     doc = responses_collection.find_one({"email": user_email, "qid": int(qid)})
     if doc:
@@ -524,8 +538,8 @@ else:
                         "responses": st.session_state.current_responses, 
                         "timestamp": datetime.datetime.utcnow()
                     })
+                    st.success("Response submitted!")
                     st.session_state.answer_idx = 0
                     st.session_state.current_responses = {}
-                    st.success("Response submitted!")
-                    st.switch_page("pages/annotation.py")
+                    go_to_next_uncompleted()
 
