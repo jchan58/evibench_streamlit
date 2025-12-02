@@ -128,9 +128,18 @@ else:
         )
         
         # clear the accuracy comment when change
+        prev_accuracy_key = f"prev_accuracy_{row['QID']}_{idx+1}"
+        if prev_accuracy_key not in st.session_state:
+            st.session_state[prev_accuracy_key] = accuracy
+
+        # if the user changes radio then update
         explain_key = f"accuracy_explain_{row['QID']}_{idx+1}"
-        if accuracy != accuracy_default and explain_key in st.session_state:
-            st.session_state[explain_key] = ""
+        if accuracy != st.session_state[prev_accuracy_key]:
+            if explain_key in st.session_state:
+                st.session_state[explain_key] = ""
+
+        # update previous key
+        st.session_state[prev_accuracy_key] = accuracy
 
         # require explanation for moderate or low answers
         if accuracy == "Moderate":
