@@ -42,6 +42,33 @@ completed_qids_ptr = responses_collection.find(
 completed_qids = {doc["qid"] for doc in completed_qids_ptr}
 uncompleted_qids = user_df[~user_df['QID'].isin(completed_qids)]
 
+st.sidebar.markdown("## 📋 Your Questions")
+user_qids = user_df["QID"].tolist()
+if "current_qid" not in st.session_state:
+    st.session_state.current_qid = uncompleted_qids.iloc[0]["QID"] if not uncompleted_qids.empty else user_qids[0]
+
+def switch_question(target_qid):
+    """Switch to another question, saving current progress."""
+    st.session_state.current_qid = target_qid
+    st.session_state.answer_idx = 0
+    st.session_state.current_responses = {}
+
+    st.rerun()
+
+for qid in user_qids:
+    is_current = (qid == st.session_state.current_qid)
+    label = f"➡️ QID {qid}" if is_current else f"QID {qid}"
+
+    if qid in completed_qids:
+        label = f"✅ {label}"
+        button_key = f"goto_{qid}"
+        if st.sidebar.button(label, key=button_key):
+            switch_question(qid)
+    else:
+        button_key = f"goto_{qid}"
+        if st.sidebar.button(label, key=button_key):
+            switch_question(qid)
+
 # Check the progress of the user
 total = len(user_df)
 completed = len(completed_qids)
@@ -70,11 +97,9 @@ st.divider()
 if uncompleted_qids.empty:
     st.success("You've completed all annotation!")
 else:
-    row = uncompleted_qids.iloc[0]
-
+    row = user_df[user_df["QID"] == st.session_state.current_qid].iloc[0]
     st.markdown("### 📌 Topic")
     st.info(row['Qtopic'])
-
     with st.expander("❓ Question"):
         st.write(row['Question'])
     
