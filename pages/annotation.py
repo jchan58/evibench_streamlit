@@ -265,21 +265,6 @@ else:
             if st.button("Back") and idx > 0:
                 st.session_state.answer_idx -= 1
                 st.rerun()
-        with cols[1]:
-            pass
-
-        with cols[2]:
-            pass
-
-        with cols[3]:
-            pass
-
-        with cols[4]:
-            pass
-
-        with cols[5]:
-            pass
-
         with cols[7]:
             if st.button("Next"): 
                 valid = True
@@ -376,6 +361,8 @@ else:
         cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back"):
+                st.session_state.current_responses["reference_ratings"] = reference_ratings
+                st.session_state.current_responses["preferred_reference"] = preferred
                 st.session_state.answer_idx = 3
                 st.rerun()
 
