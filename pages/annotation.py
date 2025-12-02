@@ -260,8 +260,7 @@ else:
             height=80
         )
 
-        cols = st.columns([1, 1, 1, 1, 1, 1, 1])
-
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back") and idx > 0:
                 st.session_state.answer_idx -= 1
@@ -281,7 +280,7 @@ else:
         with cols[5]:
             pass
 
-        with cols[6]:
+        with cols[7]:
             if st.button("Next"): 
                 valid = True
                 error_msgs = []
@@ -374,36 +373,43 @@ else:
             key=f"preferred_{row['QID']}"
         )
 
-        if st.button("Next"):
-            valid = True
-            errors = []
-
-            # Validate all reference ratings
-            for i in range(1, 5):
-                r = reference_ratings[f"Reference{i}"]["rating"]
-                c = reference_ratings[f"Reference{i}"]["comment"]
-
-                if r is None:
-                    valid = False
-                    errors.append(f"Please rate Reference {i}.")
-                if r in ["Average", "Bad"] and (not c or not c.strip()):
-                    valid = False
-                    errors.append(f"Please provide a comment for Reference {i}.")
-
-            if preferred is None:
-                valid = False
-                errors.append("Please select your preferred reference.")
-
-            if not valid:
-                for msg in errors:
-                    st.error(msg)
-            else:
-                # Save to session state
-                st.session_state.current_responses["reference_ratings"] = reference_ratings
-                st.session_state.current_responses["preferred_reference"] = preferred
-
-                st.session_state.answer_idx = 5
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+        with cols[0]:
+            if st.button("Back"):
+                st.session_state.answer_idx = 3
                 st.rerun()
+
+        with cols[7]:
+            if st.button("Next"):
+                valid = True
+                errors = []
+
+                # Validate all reference ratings
+                for i in range(1, 5):
+                    r = reference_ratings[f"Reference{i}"]["rating"]
+                    c = reference_ratings[f"Reference{i}"]["comment"]
+
+                    if r is None:
+                        valid = False
+                        errors.append(f"Please rate Reference {i}.")
+                    if r in ["Average", "Bad"] and (not c or not c.strip()):
+                        valid = False
+                        errors.append(f"Please provide a comment for Reference {i}.")
+
+                if preferred is None:
+                    valid = False
+                    errors.append("Please select your preferred reference.")
+
+                if not valid:
+                    for msg in errors:
+                        st.error(msg)
+                else:
+                    # Save to session state
+                    st.session_state.current_responses["reference_ratings"] = reference_ratings
+                    st.session_state.current_responses["preferred_reference"] = preferred
+
+                    st.session_state.answer_idx = 5
+                    st.rerun()
 
     if idx == 5:
         st.markdown("### Select the Best Answers")
