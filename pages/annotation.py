@@ -166,6 +166,11 @@ else:
                 if analysis_cat_default else None),
             key=f"analysis_cat_{row['QID']}_{idx+1}"
         )
+        # reset if category changes
+        if analysis_cat != analysis_cat_default:
+            analysis_detail_default = []
+            analysis_other_default = ""
+            
         if analysis_cat == 'Good': 
             analysis_detail = st.multiselect(
                 "Why was it good? (select all that apply)",
