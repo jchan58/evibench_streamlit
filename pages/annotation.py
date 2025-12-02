@@ -84,8 +84,30 @@ else:
         st.session_state.current_responses = {}
 
     idx = st.session_state.answer_idx
+    
+    # save the current values
+    saved = st.session_state.current_responses.get(f"Answer{idx+1}", {})
 
-    # Only show answers when idx is greater than 4
+    def get_saved(path, default=None):
+        node = saved
+        for p in path:
+            if node and p in node:
+                node = node[p]
+            else:
+                return default
+        return node
+
+    accuracy_default = get_saved(["accuracy", "rating"])
+    accuracy_explain_default = get_saved(["accuracy", "explanation"], "")
+    comp_default = get_saved(["comprehension"], 3)
+    novel_default = get_saved(["novelty"])
+    analysis_cat_default = get_saved(["analysis_logic", "category"])
+    analysis_detail_default = get_saved(["analysis_logic", "details"], [])
+    analysis_other_default = get_saved(["analysis_logic", "others_explanation"], "")
+    other_comments_default = get_saved(["feedback"], "")
+
+
+    # Only show answers when idx is less than 4
     if idx < 4:
         ans_col = f"Answer{idx+1}"
         ref_col = f"Reference{idx+1}"
@@ -100,7 +122,8 @@ else:
         accuracy = st.radio(
             "How accurate was the answer?",
             ["High", "Moderate", "Low Accuracy"],
-            index=None,
+            index=(["High","Moderate","Low Accuracy"].index(accuracy_default)
+                if accuracy_default else None),
             key=f"accuracy_{row['QID']}_{idx+1}"
         )
 
@@ -108,12 +131,14 @@ else:
         if accuracy == "Moderate":
             accuracy_explain = st.text_area(
                 "Please explain why the accuracy was moderate:",
+                value=accuracy_explain_default,
                 key=f"accuracy_explain_{row['QID']}_{idx+1}",
                 height=80
             )
         elif accuracy == "Low Accuracy":
             accuracy_explain = st.text_area(
                 "Please explain why the accuracy was low:",
+                value=accuracy_explain_default,
                 key=f"accuracy_explain_{row['QID']}_{idx+1}",
                 height=80
             )
@@ -122,24 +147,25 @@ else:
 
         comp = st.slider(
             "How comprehensive was the answer?",
-            1, 5, 3,
+            1, 5,
+            value=comp_default,
             key=f"comp_{row['QID']}_{idx+1}"
         )
 
         novel = st.radio(
             "Were there novel findings?",
             ["Yes", "No", "Maybe"],
-            index=None,
+            index=(["Yes","No","Maybe"].index(novel_default)
+                if novel_default else None),
             key=f"novel_{row['QID']}_{idx+1}"
         )
-
         analysis_cat = st.radio(
             "How was the analysis quality?",
             ["Good", "Average", "Bad"],
-            index=None,
+            index=(["Good","Average","Bad"].index(analysis_cat_default)
+                if analysis_cat_default else None),
             key=f"analysis_cat_{row['QID']}_{idx+1}"
         )
-
         if analysis_cat == 'Good': 
             analysis_detail = st.multiselect(
                 "Why was it good? (select all that apply)",
@@ -150,11 +176,13 @@ else:
                     "Profound summarization of the entire analysis",
                     "Others"
                 ],
+                default=analysis_detail_default,
                 key=f"analysis_good_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
                 analysis_other_explain = st.text_area(
                     "Please explain why choose 'Others':",
+                    value=analysis_other_default,
                     key=f"analysis_good_other_{row['QID']}_{idx+1}"
                 )
             else:
@@ -170,11 +198,13 @@ else:
                     "Reasonable summarization of the analysis",
                     "Others"
                 ],
+                default=analysis_detail_default,
                 key=f"analysis_general_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
                 analysis_other_explain = st.text_area(
                     "Please explain why choose 'Others':",
+                    value=analysis_other_default,
                     key=f"analysis_average_other_{row['QID']}_{idx+1}"
                 )
             else:
@@ -190,11 +220,13 @@ else:
                     "Missing or superficial summarization of the analysis",
                     "Others"
                 ],
+                default=analysis_detail_default,
                 key=f"analysis_bad_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
                 analysis_other_explain = st.text_area(
                     "Please explain why choose 'Others':",
+                    value=analysis_other_default,
                     key=f"analysis_bad_other_{row['QID']}_{idx+1}"
                 )
             else:
@@ -204,52 +236,60 @@ else:
 
         other_comments = st.text_area(
             "Is there any additional feedback you would like to give?",
+            value=other_comments_default,
             key=f"feedback_{row['QID']}_{idx+1}",
             height=80
         )
 
-        # Next button for each answer
-        if st.button("Next"): 
-            valid = True
-            error_msgs = []
+        cols = st.columns([1,1])
 
-            # Accuracy validation
-            if accuracy in ["Moderate", "Low Accuracy"] and (not accuracy_explain or not accuracy_explain.strip()):
-                valid = False
-                error_msgs.append("Please provide an explanation for the accuracy rating.")
-            
-            if "Others" in analysis_detail and (not analysis_other_explain or not analysis_other_explain.strip()):
-                valid = False
-                error_msgs.append("Please provide an explanation for 'Others' in analysis detail.")
+        with cols[0]:
+            if st.button("Back") and idx > 0:
+                st.session_state.answer_idx -= 1
+                st.rerun()
 
-            if not valid:
-                for msg in error_msgs:
-                    st.error(msg)
-            else:
-                end_time = time.time()
-                time_spent = end_time - st.session_state.start_time
-                st.session_state.start_time = time.time()
-                st.session_state.current_responses[f"Answer{idx+1}"] = {
-                    "accuracy": {
-                        "rating": accuracy,
-                        "explanation": accuracy_explain
-                    },
-                    "comprehension": comp,
-                    "novelty": novel, 
-                    "analysis_logic": {
-                        "category": analysis_cat,
-                        "details": analysis_detail, 
-                        "others_explanation": analysis_other_explain
-                    },
-                    "feedback": other_comments,
-                    "time_spent_sec": round(time_spent, 2)
-                }
-                if idx < 3: 
-                    st.session_state.answer_idx += 1
-                    st.rerun() 
-                else: 
-                    st.session_state.answer_idx = 4
-                    st.rerun()
+        with cols[1]:
+            if st.button("Next"): 
+                valid = True
+                error_msgs = []
+
+                # Accuracy validation
+                if accuracy in ["Moderate", "Low Accuracy"] and (not accuracy_explain or not accuracy_explain.strip()):
+                    valid = False
+                    error_msgs.append("Please provide an explanation for the accuracy rating.")
+                
+                if "Others" in analysis_detail and (not analysis_other_explain or not analysis_other_explain.strip()):
+                    valid = False
+                    error_msgs.append("Please provide an explanation for 'Others' in analysis detail.")
+
+                if not valid:
+                    for msg in error_msgs:
+                        st.error(msg)
+                else:
+                    end_time = time.time()
+                    time_spent = end_time - st.session_state.start_time
+                    st.session_state.start_time = time.time()
+                    st.session_state.current_responses[f"Answer{idx+1}"] = {
+                        "accuracy": {
+                            "rating": accuracy,
+                            "explanation": accuracy_explain
+                        },
+                        "comprehension": comp,
+                        "novelty": novel, 
+                        "analysis_logic": {
+                            "category": analysis_cat,
+                            "details": analysis_detail, 
+                            "others_explanation": analysis_other_explain
+                        },
+                        "feedback": other_comments,
+                        "time_spent_sec": round(time_spent, 2)
+                    }
+                    if idx < 3: 
+                        st.session_state.answer_idx += 1
+                        st.rerun() 
+                    else: 
+                        st.session_state.answer_idx = 4
+                        st.rerun()
         progress_fraction = (idx + 1) / MAX_ANSWER
         st.markdown("---")
         st.progress(progress_fraction)
