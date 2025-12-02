@@ -317,71 +317,122 @@ else:
         st.markdown("### 📚 Reference Evaluation")
         st.markdown("Please rate the quality of each reference and then select your preferred one.")
 
-        # get saved responses
-        new_refs = {}
-        for i in range(1, 5):
-            new_refs[f"Reference{i}"] = {
-                "rating": st.session_state[f"ref_rating_{row['QID']}_{i}"],
-                "comment": st.session_state.get(f"ref_comment_{row['QID']}_{i}", "")
-            }
-        st.session_state.current_responses["reference_ratings"] = new_refs
-        st.session_state.current_responses["preferred_reference"] = st.session_state[f"preferred_{row['QID']}"]
+        # ALWAYS define these at the top of this block
+        saved_refs = st.session_state.current_responses.get("reference_ratings", {}) or {}
+        saved_pref = st.session_state.current_responses.get("preferred_reference")
+
         reference_ratings = {}
+
         for i in range(1, 5):
+            ref_key = f"Reference{i}"
+
             st.markdown(f"#### Reference {i}")
             with st.expander(f"📚 Reference {i} Content"):
-                st.code(row[f"Reference{i}"], language="text")
+                st.code(row[ref_key], language="text")
 
             rating_key = f"ref_rating_{row['QID']}_{i}"
             comment_key = f"ref_comment_{row['QID']}_{i}"
+
+            # pull any previously saved rating/comment
+            saved_rating = saved_refs.get(ref_key, {}).get("rating")
+            saved_comment = saved_refs.get(ref_key, {}).get("comment", "")
+
+            rating_index = (
+                ["Good", "Average", "Bad"].index(saved_rating)
+                if saved_rating in ["Good", "Average", "Bad"]
+                else None
+            )
+
             rating = st.radio(
                 f"How was Reference {i}?",
                 ["Good", "Average", "Bad"],
-                index=(["Good", "Average", "Bad"].index(saved_refs.get(f"Reference{i}", {}).get("rating"))
-                    if f"Reference{i}" in saved_refs else None),
-                key=rating_key
+                index=rating_index,
+                key=rating_key,
             )
 
             # Require comment if Average or Bad
             if rating in ["Average", "Bad"]:
                 comment = st.text_area(
                     f"Please explain why Reference {i} was {rating.lower()}",
-                    value=saved_refs.get(f"Reference{i}", {}).get("comment", ""),
+                    value=saved_comment,
                     key=comment_key,
-                    height=80
+                    height=80,
                 )
             else:
-                comment = None
+                comment = ""
 
-            reference_ratings[f"Reference{i}"] = {
+            reference_ratings[ref_key] = {
                 "rating": rating,
-                "comment": comment
+                "comment": comment,
             }
 
             st.markdown("---")
 
+        # preferred reference
+        options_pref = ["Reference 1", "Reference 2", "Reference 3", "Reference 4"]
+        pref_index = options_pref.index(saved_pref) if saved_pref in options_pref else None
+
         preferred = st.radio(
             "Which reference do you prefer overall?",
-            ["Reference 1", "Reference 2", "Reference 3", "Reference 4"],
-            index=(["Reference 1", "Reference 2", "Reference 3", "Reference 4"].index(saved_pref)
-                if saved_pref else None),
-            key=f"preferred_{row['QID']}"
+            options_pref,
+            index=pref_index,
+            key=f"preferred_{row['QID']}",
         )
+
         cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             if st.button("Back"):
                 new_refs = {}
                 for i in range(1, 5):
-                    new_refs[f"Reference{i}"] = {
-                        "rating": st.session_state[f"ref_rating_{row['QID']}_{i}"],
-                        "comment": st.session_state.get(f"ref_comment_{row['QID']}_{i}", "")
+                    ref_key = f"Reference{i}"
+                    rating_key = f"ref_rating_{row['QID']}_{i}"
+                    comment_key = f"ref_comment_{row['QID']}_{i}"
+
+                    new_refs[ref_key] = {
+                        "rating": st.session_state.get(rating_key),
+                        "comment": st.session_state.get(comment_key, ""),
                     }
 
                 st.session_state.current_responses["reference_ratings"] = new_refs
                 st.session_state.current_responses["preferred_reference"] = st.session_state.get(
                     f"preferred_{row['QID']}"
                 )
+
                 st.session_state.answer_idx = 3
+                st.rerun()
+
+    # NEXT BUTTON
+    with cols[7]:
+        if st.button("Next"):
+            valid = True
+            errors = []
+
+            # Validate all reference ratings
+            for i in range(1, 5):
+                ref_key = f"Reference{i}"
+                r = reference_ratings[ref_key]["rating"]
+                c = reference_ratings[ref_key]["comment"]
+
+                if r is None:
+                    valid = False
+                    errors.append(f"Please rate Reference {i}.")
+                if r in ["Average", "Bad"] and (not c or not c.strip()):
+                    valid = False
+                    errors.append(f"Please provide a comment for Reference {i}.")
+
+            if preferred is None:
+                valid = False
+                errors.append("Please select your preferred reference.")
+
+            if not valid:
+                for msg in errors:
+                    st.error(msg)
+            else:
+                # Save to session state
+                st.session_state.current_responses["reference_ratings"] = reference_ratings
+                st.session_state.current_responses["preferred_reference"] = preferred
+
+                st.session_state.answer_idx = 5
                 st.rerun()
 
         with cols[7]:
