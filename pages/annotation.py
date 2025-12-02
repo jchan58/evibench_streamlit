@@ -51,18 +51,30 @@ completed_qids_ptr = responses_collection.find(
 completed_qids = {doc["qid"] for doc in completed_qids_ptr}
 uncompleted_qids = user_df[~user_df['QID'].isin(completed_qids)]
 
+def load_saved_response(qid):
+    doc = responses_collection.find_one({"email": user_email, "qid": int(qid)})
+    if doc:
+        return doc.get("responses", {})
+    return {}
+
+def switch_question(target_qid):
+    st.session_state.current_qid = target_qid
+    st.session_state.answer_idx = 0
+    if target_qid in completed_qids:
+        st.session_state.current_responses = load_saved_response(target_qid)
+    else:
+        st.session_state.current_responses = {}
+    st.rerun()
+
 st.sidebar.markdown("## 📋 Your Questions")
 user_qids = user_df["QID"].tolist()
 if "current_qid" not in st.session_state:
-    st.session_state.current_qid = uncompleted_qids.iloc[0]["QID"] if not uncompleted_qids.empty else user_qids[0]
-
-def switch_question(target_qid):
-    """Switch to another question, saving current progress."""
-    st.session_state.current_qid = target_qid
-    st.session_state.answer_idx = 0
-    st.session_state.current_responses = {}
-
-    st.rerun()
+    first_qid = uncompleted_qids.iloc[0]["QID"] if not uncompleted_qids.empty else user_qids[0]
+    st.session_state.current_qid = first_qid
+    if first_qid in completed_qids:
+        st.session_state.current_responses = load_saved_response(first_qid)
+    else:
+        st.session_state.current_responses = {}
 
 for qid in user_qids:
     is_current = (qid == st.session_state.current_qid)
