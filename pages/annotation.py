@@ -234,7 +234,7 @@ else:
             key=f"novel_{row['QID']}_{idx+1}"
         )
         analysis_cat = st.radio(
-            "How was the analysis quality?",
+            "How was the analysis quality? (if no analysis available, please annotate base on quality of answer)",
             ["Good", "Average", "Bad"],
             index=(["Good","Average","Bad"].index(analysis_cat_default)
                 if analysis_cat_default else None),
