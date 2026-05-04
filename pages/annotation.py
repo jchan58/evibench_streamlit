@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import datetime
 from pymongo import MongoClient
-from streamlit_extras.switch_page_button import switch_page
 import time
 
 # remove the pages sidebar
