@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 import datetime
-from streamlit_extras.switch_page_button import switch_page
 
 # Connect to MongoDB
 MONGO_URI = st.secrets["MONGO_URI"]
