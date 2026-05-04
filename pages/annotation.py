@@ -34,7 +34,7 @@ def get_db():
 # Load in db 
 evibench_df = load_evibench()
 db = get_db()
-responses_collection = db["responses"]
+responses_collection = db["responses_2"]
 
 # Check if user is logged in 
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
