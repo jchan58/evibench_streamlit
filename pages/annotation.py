@@ -179,7 +179,7 @@ else:
 
         # Eval Topics
         accuracy = st.radio(
-            "How accurate was the answer?",
+            "How accurate was the answer? (i.e. were the facts, claims, and conclusions scientifically correct and supported by the references?)",
             ["High", "Moderate", "Low Accuracy"],
             index=(["High","Moderate","Low Accuracy"].index(accuracy_default)
                 if accuracy_default else None),
@@ -219,21 +219,21 @@ else:
             accuracy_explain = None
 
         comp = st.slider(
-            "How comprehensive was the answer?",
+            "How comprehensive was the answer? (i.e. did it fully address all aspects of the question, or were there gaps in coverage?)",
             1, 5,
             value=comp_default,
             key=f"comp_{row['QID']}_{idx+1}"
         )
 
         novel = st.radio(
-            "Were there novel findings?",
+            "Were there any novel insights? (i.e. correct information that is often overlooked or underappreciated)",
             ["Yes", "No", "Maybe"],
             index=(["Yes","No","Maybe"].index(novel_default)
                 if novel_default else None),
             key=f"novel_{row['QID']}_{idx+1}"
         )
         analysis_cat = st.radio(
-            "How was the analysis quality? (if no analysis available, please annotate base on quality of answer)",
+            "How was the analysis quality? (i.e. how well did the answer break down and reason through the question? If no analysis is available, rate based on the overall quality of the answer instead)",
             ["Good", "Average", "Bad"],
             index=(["Good","Average","Bad"].index(analysis_cat_default)
                 if analysis_cat_default else None),
