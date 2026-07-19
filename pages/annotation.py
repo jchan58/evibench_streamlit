@@ -519,9 +519,27 @@ else:
     if idx == 5:
         st.markdown("### Select the Best Answers")
         st.markdown("You have reviewed all answers. Please select which answers you felt were the best.")
+
+        # Summary of previous ratings
+        st.markdown("#### Your Ratings Summary")
+        responses = st.session_state.current_responses
         for i in range(1, 5):
-            with st.expander(f"Answer {i}"):
+            ans_data = responses.get(f"Answer{i}", {})
+            acc = ans_data.get("accuracy", {}).get("rating", "—")
+            comp = ans_data.get("comprehension", "—")
+            novel = ans_data.get("novelty", "—")
+            analysis = ans_data.get("analysis_logic", {}).get("category", "—")
+            with st.expander(f"Answer {i} — Accuracy: {acc} | Comprehension: {comp}/5 | Novelty: {novel} | Analysis: {analysis}"):
                 st.write(row[f"Answer{i}"])
+
+        ref_ratings = responses.get("reference_ratings", {})
+        pref_ref = responses.get("preferred_reference", "—")
+        ref_summary_parts = []
+        for i in range(1, 5):
+            r = ref_ratings.get(f"Reference{i}", {}).get("rating", "—")
+            ref_summary_parts.append(f"Ref {i}: {r}")
+        st.markdown(f"**References:** {' | '.join(ref_summary_parts)} | Preferred: {pref_ref}")
+
         st.markdown("---")
         saved_best = st.session_state.current_responses.get("best_answers", [])
         best_answers_selected = st.multiselect(
