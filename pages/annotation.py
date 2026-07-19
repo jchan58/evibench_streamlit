@@ -4,6 +4,16 @@ import datetime
 from pymongo import MongoClient
 import time
 
+
+def fix_encoding(val):
+    """Fix mojibake: UTF-8 bytes that were decoded as Latin-1."""
+    if isinstance(val, str):
+        try:
+            return val.encode("latin-1").decode("utf-8")
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            return val
+    return val
+
 # remove the pages sidebar
 st.markdown("""
 <style>
@@ -23,7 +33,10 @@ def load_evibench():
     evibench_collection = db["evibench"]
 
     docs = list(evibench_collection.find({}, {"_id": 0}))
-    return pd.DataFrame(docs)
+    df = pd.DataFrame(docs)
+    str_cols = df.select_dtypes(include="object").columns
+    df[str_cols] = df[str_cols].map(fix_encoding)
+    return df
 
 @st.cache_resource
 def get_db():

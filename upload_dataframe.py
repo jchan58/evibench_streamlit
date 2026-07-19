@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from pymongo import MongoClient
 
-df = pd.read_csv("new_question_1214_chi.csv")
+df = pd.read_csv("new_question_1214_chi.csv", encoding="utf-8")
 
 MONGO_URI = st.secrets["MONGO_URI"]
 client = MongoClient(MONGO_URI)
