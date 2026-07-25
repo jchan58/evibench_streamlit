@@ -36,13 +36,13 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    user_email = st.text_input("Please enter your email").strip().lower()
+    user_email = st.text_input("Please enter your username").strip().lower()
 
     if st.button("Enter"):
         if not user_email:
-            st.error("Please enter your email")
+            st.error("Please enter your username")
         elif user_email not in evibench_df["Email"].str.lower().tolist():
-            st.error("Sorry, your email is not approved for this study")
+            st.error("Sorry, your username is not approved for this study")
         else:
             # Save user info if never logged in
             user = users_collection.find_one({"email": user_email})

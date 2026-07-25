@@ -1,0 +1,58 @@
+QID	Question	LoginName
+QID:53	A subtype of melanoma exhibits high NGFR expression and high ERBB3 activity. Such melanoma exhibits a transcriptional state similar to Schwann Cell Precursors (SCP), and are resistant to immunotherapy. Schwannoma is cancer of the Schwann cells. One of Schwannoma subtypes exhibit NF2-mutation. Therefore, For the signaling mentioned in the background, what are those commonly shared by SCP-like melanoma and NF2-mutated Schwannoma?	melanoma
+QID:54	What are the genetic and epigenetic features, and transcriptional programs specific to histological subtypes of melanoma? How are these features related to the origin of cells in each subtype?	melanoma
+QID:55	How are developmental programs of neural crest and melanocytes co-opted by melanoma for adaptation to the environments and therapeutic resistance?	melanoma
+QID:56	What are the germline variants that modulate immune microenvironment of melanoma? What are their mechanisms?	melanoma
+QID:57	How does gut microbiome regulate immune microenvironment of melanoma? What does it modulate the response to immunotherapy?	melanoma
+QID:58	What determines the difference in the melanoma incidence among human races?	melanoma
+QID:59	How does intratumoral heterogeneity impact responses of melanoma to therapy, and what is its mechanism?	melanoma
+QID:60	How does melanoma cell adapt to environmental stress by altering metabolic programs? Can those programs be targeted for melanoma treatment?	melanoma
+QID:61	What are the genetic and epigenetic features of brain metastases in melanoma associated with therapeutic responses? What are the mechanisms?	melanoma
+QID:62	What are the genetic and epigenetic features of melanoma to determine the organ tropism of metastasis?	melanoma
+QID:63	What are the genetic and epigenetic features of early-stage primary melanoma to predict future disease progression, and determine the use of adjuvant therapy?	melanoma
+
+
+
+
+QID	Question	LoginName
+QID:27	Which immune factors regulate the circadian rhythm of gut motility?	ibd
+QID:28	What controls intestinal Treg IL-10 production?	ibd
+QID:30	Which immune factors regulate acetylcholine release? And how?	ibd
+QID:42	Why can gut-liver axis control intestinal stem cell proliferation?	ibd
+QID:45	How does hepatectomy control intestinal stem cell expansion?	ibd
+QID:46	How does intestinal inflammation induce liver response?	ibd 
+QID:47	How does Wnt signaling repress stem cell proliferation?	ibd
+QID:48	How does PEDF modulate intestinal stem cell expansion?	ibd
+QID:49	Why Fenofibrate induce intestinal inflammation?	ibd
+QID:50	How does liver PPARa control intestinal homeostasis?	ibd
+
+
+
+
+
+QID	Question	LoginName
+QID:66	Which analytes are commonly evaluated in liquid biopsy testing?	liquid_biopsy
+QID:67	What are the sources of analytes in a liquid biopsy?	liquid_biopsy
+QID:69	What are the differences and advantages of liquid biopsy compared with the traditional gold-standard tissue-biopsy?	liquid_biopsy
+QID:72	What biomarkers can be assessed through liquid biopsy to identify NSCLC-related mutations?	liquid_biopsy
+QID:73	In which situations can liquid biopsy be used during the course of NSCLC therapy?	liquid_biopsy
+QID:74	How does a liquid biopsy help assess treatment response in NSCLC after therapy has begun?	liquid_biopsy
+QID:76	What liquid biopsy markers are available for breast cancer-related analytes?	liquid_biopsy
+QID:77	How accurate are liquid biopsy approached for early detection of breast cancer?	liquid_biopsy
+QID:78	Do any liquid biopsy biomarkers help detect disease progression in breast cancer?	liquid_biopsy
+QID:79	How does liquid biopsy aid in determining optimal treatment strategies and monitoring response rates?	liquid_biopsy
+QID:80	What liquid biopsy markers are available to evaluate patients with gliomas?	liquid_biopsy
+QID:81	What is the most reliable sample source for liquid biopsy in CNS cancers, including leptomeningeal metastases from extracranial tumors?	liquid_biopsy
+
+
+
+
+
+
+
+
+
+
+
+
+
