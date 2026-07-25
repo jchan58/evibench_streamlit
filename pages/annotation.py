@@ -216,14 +216,14 @@ else:
         # require explanation for moderate or low answers
         if accuracy == "Moderate":
             accuracy_explain = st.text_area(
-                "Please explain why the accuracy was moderate:",
+                "Please explain why the accuracy was moderate (optional):",
                 value=accuracy_explain_default,
                 key=f"accuracy_explain_{row['QID']}_{idx+1}",
                 height=80
             )
         elif accuracy == "Low Accuracy":
             accuracy_explain = st.text_area(
-                "Please explain why the accuracy was low:",
+                "Please explain why the accuracy was low (optional):",
                 value=accuracy_explain_default,
                 key=f"accuracy_explain_{row['QID']}_{idx+1}",
                 height=80
@@ -246,7 +246,7 @@ else:
             key=f"novel_{row['QID']}_{idx+1}"
         )
         analysis_cat = st.radio(
-            "How was the analysis quality? (i.e. how well did the answer break down and reason through the question? If no analysis is available, rate based on the overall quality of the answer instead)",
+            "How was the analysis quality? (i.e. how well did the answer break down and reason through the question?)",
             ["Good", "Average", "Bad"],
             index=(["Good","Average","Bad"].index(analysis_cat_default)
                 if analysis_cat_default else None),
@@ -257,13 +257,13 @@ else:
             analysis_detail_default = []
             analysis_other_default = ""
 
-        if analysis_cat == 'Good': 
+        if analysis_cat == 'Good':
             analysis_detail = st.multiselect(
                 "Why was it good? (select all that apply)",
                 [
                     "Good explanation of biological concepts",
                     "Insightful analysis of different aspects of the question",
-                    "Strong evidence supporting the core conclusion",
+                    "Evidence is relevant to the question/claim",
                     "Profound summarization of the entire analysis",
                     "Others"
                 ],
@@ -285,7 +285,7 @@ else:
                 [
                     "Broad explanation of biological concepts",
                     "Straightforward analysis of the question",
-                    "Relevant evidence supporting the core conclusion",
+                    "Evidence is partially relevant to the question/claim",
                     "Reasonable summarization of the analysis",
                     "Others"
                 ],
@@ -307,7 +307,7 @@ else:
                 [
                     "No or poor explanation of biological concepts",
                     "Shallow or overly brief analysis of the question",
-                    "Limited or weak evidence for the core conclusion",
+                    "Evidence is not relevant to the question/claim",
                     "Missing or superficial summarization of the analysis",
                     "Others"
                 ],
@@ -342,11 +342,6 @@ else:
                 valid = True
                 error_msgs = []
 
-                # Accuracy validation
-                if accuracy in ["Moderate", "Low Accuracy"] and (not accuracy_explain or not accuracy_explain.strip()):
-                    valid = False
-                    error_msgs.append("Please provide an explanation for the accuracy rating.")
-                
                 if "Others" in analysis_detail and (not analysis_other_explain or not analysis_other_explain.strip()):
                     valid = False
                     error_msgs.append("Please provide an explanation for 'Others' in analysis detail.")
@@ -416,7 +411,7 @@ else:
             )
 
             rating = st.radio(
-                f"How was Reference {i}?",
+                f"How relevant was Reference {i} to the question/claim?",
                 ["Good", "Average", "Bad"],
                 index=rating_index,
                 key=rating_key,
@@ -435,7 +430,7 @@ else:
             # require comment if not good
             if rating in ["Average", "Bad"]:
                 comment = st.text_area(
-                    f"Please explain why Reference {i} was {rating.lower()}",
+                    f"Please explain why Reference {i} was {rating.lower()} (optional)",
                     value=saved_comment,
                     key=comment_key,
                     height=80,
@@ -497,9 +492,6 @@ else:
                     if r is None:
                         valid = False
                         errors.append(f"Please rate Reference {i}.")
-                    if r in ["Average", "Bad"] and (not c or not c.strip()):
-                        valid = False
-                        errors.append(f"Please provide a comment for Reference {i}.")
 
                 if preferred is None:
                     valid = False
