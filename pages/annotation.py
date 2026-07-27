@@ -48,6 +48,7 @@ def get_db():
 evibench_df = load_evibench()
 db = get_db()
 responses_collection = db["responses_2"]
+edits_collection = db["response_edits"]
 
 # Check if user is logged in 
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
@@ -549,18 +550,25 @@ else:
                 st.rerun()
         
         with cols[6]:
-            if st.button("Submit"):
+            is_edit = int(row["QID"]) in completed_qids
+            submit_label = "Save Edit" if is_edit else "Submit"
+            if st.button(submit_label):
                 if not best_answers_selected:
                     st.error("Please select at least one answer before submitting.")
                 else:
                     st.session_state.current_responses["best_answers"] = best_answers_selected
-                    responses_collection.insert_one({
-                        "email": user_email, 
+                    doc = {
+                        "email": user_email,
                         "qid": int(row["QID"]),
-                        "responses": st.session_state.current_responses, 
+                        "responses": st.session_state.current_responses,
                         "timestamp": datetime.datetime.utcnow()
-                    })
-                    st.success("Response submitted!")
+                    }
+                    if is_edit:
+                        edits_collection.insert_one(doc)
+                        st.success("Edit saved!")
+                    else:
+                        responses_collection.insert_one(doc)
+                        st.success("Response submitted!")
                     st.session_state.answer_idx = 0
                     st.session_state.current_responses = {}
                     go_to_next_uncompleted()
