@@ -142,9 +142,11 @@ with col2:
 st.divider()
 
 # Display
-if uncompleted_qids.empty:
+if uncompleted_qids.empty and st.session_state.current_qid not in completed_qids:
     st.success("You've completed all annotation!")
 else:
+    if uncompleted_qids.empty and st.session_state.current_qid in completed_qids:
+        st.info("You've completed all annotations. You are now editing a previous response.")
     row = user_df[user_df["QID"] == st.session_state.current_qid].iloc[0]
     st.markdown("### 📌 Topic")
     st.info(row['Qtopic'])
