@@ -261,16 +261,17 @@ else:
             analysis_other_default = ""
 
         if analysis_cat == 'Good':
+            good_options = [
+                "Good explanation of biological concepts",
+                "Insightful analysis of different aspects of the question",
+                "Evidence is relevant to the question/claim",
+                "Profound summarization of the entire analysis",
+                "Others"
+            ]
             analysis_detail = st.multiselect(
                 "Why was it good? (select all that apply)",
-                [
-                    "Good explanation of biological concepts",
-                    "Insightful analysis of different aspects of the question",
-                    "Evidence is relevant to the question/claim",
-                    "Profound summarization of the entire analysis",
-                    "Others"
-                ],
-                default=analysis_detail_default,
+                good_options,
+                default=[d for d in analysis_detail_default if d in good_options],
                 key=f"analysis_good_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
@@ -283,16 +284,17 @@ else:
                 analysis_other_explain = None
 
         elif analysis_cat == "Average":
+            avg_options = [
+                "Broad explanation of biological concepts",
+                "Straightforward analysis of the question",
+                "Evidence is partially relevant to the question/claim",
+                "Reasonable summarization of the analysis",
+                "Others"
+            ]
             analysis_detail = st.multiselect(
                 "Why was it average? (select all that apply)",
-                [
-                    "Broad explanation of biological concepts",
-                    "Straightforward analysis of the question",
-                    "Evidence is partially relevant to the question/claim",
-                    "Reasonable summarization of the analysis",
-                    "Others"
-                ],
-                default=analysis_detail_default,
+                avg_options,
+                default=[d for d in analysis_detail_default if d in avg_options],
                 key=f"analysis_general_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
@@ -305,16 +307,17 @@ else:
                 analysis_other_explain = None
 
         elif analysis_cat == "Bad":
+            bad_options = [
+                "No or poor explanation of biological concepts",
+                "Shallow or overly brief analysis of the question",
+                "Evidence is not relevant to the question/claim",
+                "Missing or superficial summarization of the analysis",
+                "Others"
+            ]
             analysis_detail = st.multiselect(
                 "Why was it bad? (select all that apply)",
-                [
-                    "No or poor explanation of biological concepts",
-                    "Shallow or overly brief analysis of the question",
-                    "Evidence is not relevant to the question/claim",
-                    "Missing or superficial summarization of the analysis",
-                    "Others"
-                ],
-                default=analysis_detail_default,
+                bad_options,
+                default=[d for d in analysis_detail_default if d in bad_options],
                 key=f"analysis_bad_{row['QID']}_{idx+1}"
             )
             if "Others" in analysis_detail:
