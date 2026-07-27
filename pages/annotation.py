@@ -76,7 +76,17 @@ def go_to_next_uncompleted():
         st.session_state.answer_idx = 0
         st.session_state.current_responses = {}
     else:
-        st.session_state.current_qid = None
+        # All done — move to the next question in the list after the current one
+        all_qids = user_df["QID"].tolist()
+        current = st.session_state.current_qid
+        if current in all_qids:
+            curr_idx = all_qids.index(current)
+            next_idx = (curr_idx + 1) % len(all_qids)
+            st.session_state.current_qid = all_qids[next_idx]
+        else:
+            st.session_state.current_qid = all_qids[0]
+        st.session_state.answer_idx = 0
+        st.session_state.current_responses = load_saved_response(st.session_state.current_qid)
 
 def load_saved_response(qid):
     doc = responses_collection.find_one({"email": user_email, "qid": int(qid)})
