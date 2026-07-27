@@ -116,16 +116,8 @@ if "current_qid" not in st.session_state:
 for qid in user_qids:
     is_current = (qid == st.session_state.current_qid)
     label = f"➡️ QID {qid}" if is_current else f"QID {qid}"
-
-    if qid in completed_qids:
-        label = f"✅ {label}"
-        button_key = f"goto_{qid}"
-        if st.sidebar.button(label, key=button_key):
-            switch_question(qid)
-    else:
-        button_key = f"goto_{qid}"
-        if st.sidebar.button(label, key=button_key):
-            switch_question(qid)
+    if st.sidebar.button(label, key=f"goto_{qid}"):
+        switch_question(qid)
 
 # Check the progress of the user
 total = len(user_df)
