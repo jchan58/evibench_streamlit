@@ -3,6 +3,7 @@ import pandas as pd
 import datetime
 from pymongo import MongoClient
 import time
+import re
 
 
 def fix_encoding(val):
@@ -13,6 +14,12 @@ def fix_encoding(val):
         except (UnicodeDecodeError, UnicodeEncodeError):
             return val
     return val
+
+
+def linkify_urls(text):
+    """Convert URLs in text to clickable markdown links."""
+    url_pattern = r'(https?://[^\s\)]+)'
+    return re.sub(url_pattern, r'[\1](\1)', text)
 
 # remove the pages sidebar
 st.markdown("""
@@ -192,7 +199,7 @@ if st.session_state.current_qid is not None:
             st.write(row[ans_col])
 
         with st.expander(f"📚 Reference {idx+1}"):
-            st.code(row[ref_col], language="text")
+            st.markdown(linkify_urls(row[ref_col]))
 
         # Eval Topics
         accuracy = st.radio(
@@ -402,7 +409,7 @@ if st.session_state.current_qid is not None:
 
             st.markdown(f"#### Reference {i}")
             with st.expander(f"📚 Reference {i} Content"):
-                st.code(row[ref_key], language="text")
+                st.markdown(linkify_urls(row[ref_key]))
 
             rating_key = f"ref_rating_{row['QID']}_{i}"
             comment_key = f"ref_comment_{row['QID']}_{i}"
